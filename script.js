@@ -204,7 +204,10 @@ $(document).ready(function () {
 
 // <!-- typed js effect starts -->
 var typed = new Typed(".typing-text", {
-    strings: ["frontend development",  "android development", "web development"],
+    strings: [ "Full Stack Web Development",
+    "React Applications",
+    "Backend API Development",
+    "Building Scalable Web Apps""android development"],
     loop: true,
     typeSpeed: 50,
     backSpeed: 25,

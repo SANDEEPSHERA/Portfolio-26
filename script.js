@@ -38,7 +38,6 @@ $(document).ready(function () {
     });
 
     // <!-- emailjs to mail contact form data -->
-    // Initialize EmailJS when page loads
     let emailjsInitialized = false;
     const EMAILJS_PUBLIC_KEY = "RZ1JM84Fn_WBdehUP";
     const EMAILJS_SERVICE_ID = "service_75l74us";
@@ -56,7 +55,6 @@ $(document).ready(function () {
         }
     }
 
-    // Wait for EmailJS to load
     function waitForEmailJS(callback, maxAttempts = 10) {
         let attempts = 0;
         const checkInterval = setInterval(function() {
@@ -72,13 +70,11 @@ $(document).ready(function () {
         }, 500);
     }
 
-    // Initialize when page loads
     waitForEmailJS();
 
     $("#contact-form").submit(function (event) {
         event.preventDefault();
         
-        // Validate form
         const name = $('input[name="name"]').val().trim();
         const email = $('input[name="email"]').val().trim().toLowerCase();
         const phone = $('input[name="phone"]').val().trim();
@@ -89,32 +85,27 @@ $(document).ready(function () {
             return;
         }
 
-        // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             alert("Please enter a valid email address!");
             return;
         }
 
-        // Disable submit button to prevent multiple submissions
         const submitBtn = $(this).find('button[type="submit"]');
         const originalText = submitBtn.html();
         submitBtn.prop('disabled', true).html('Sending... <i class="fa fa-spinner fa-spin"></i>');
 
-        // Check if EmailJS is loaded
         if (typeof emailjs === 'undefined') {
             alert("Email service is not loaded. Please refresh the page and try again.");
             submitBtn.prop('disabled', false).html(originalText);
             return;
         }
 
-        // Initialize EmailJS if not already done
         if (!emailjsInitialized) {
             initializeEmailJS();
         }
 
-        // Prepare multiple parameter sets to try different variable name patterns
-        const templateParamsSet1 = {
+        const templateParams = {
             from_name: name,
             from_email: email,
             phone: phone || 'Not provided',
@@ -123,92 +114,33 @@ $(document).ready(function () {
             reply_to: email
         };
 
-        const templateParamsSet2 = {
-            name: name,
-            email: email,
-            phone: phone || 'Not provided',
-            message: message,
-            to_email: 'sc1797569@gmail.com',
-            reply_to: email
-        };
-
-        const templateParamsSet3 = {
-            user_name: name,
-            user_email: email,
-            user_phone: phone || 'Not provided',
-            user_message: message,
-            to_email: 'sc1797569@gmail.com'
-        };
-
-        // Success handler
-        function handleSuccess(response, method) {
-            console.log(`✅ SUCCESS with ${method}!`, response.status, response.text);
+        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+        .then(function () {
             document.getElementById("contact-form").reset();
-            alert("✅ Form Submitted Successfully! I'll get back to you soon.");
+            alert("✅ Form Submitted Successfully!");
             submitBtn.prop('disabled', false).html(originalText);
-        }
-
-        // First try: sendForm method (automatic field mapping)
-        emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, '#contact-form')
-        .then(function (response) {
-            handleSuccess(response, 'sendForm');
         }, function (error) {
-            console.log('sendForm failed, trying send method with different parameter sets...', error);
-            
-            // Try Set 1
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParamsSet1)
-            .then(function (response) {
-                handleSuccess(response, 'send method (Set 1)');
-            }, function (error1) {
-                console.error('Set 1 failed:', error1);
-                
-                // Try Set 2
-                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParamsSet2)
-                .then(function (response) {
-                    handleSuccess(response, 'send method (Set 2)');
-                }, function (error2) {
-                    console.error('Set 2 failed:', error2);
-                    
-                    // Try Set 3
-                    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParamsSet3)
-                    .then(function (response) {
-                        handleSuccess(response, 'send method (Set 3)');
-                    }, function (error3) {
-                        // All attempts failed
-                        const lastError = error3 || error2 || error1 || error;
-                        console.error('❌ All attempts failed. Last error:', lastError);
-                        
-                        let errorMsg = "Form submission failed!\n\n";
-                        if (lastError.text) {
-                            errorMsg += "Error: " + lastError.text + "\n\n";
-                        }
-                        if (lastError.status) {
-                            errorMsg += "Status: " + lastError.status + "\n\n";
-                        }
-                        errorMsg += "Please verify in EmailJS Dashboard:\n";
-                        errorMsg += "1. Service ID: " + EMAILJS_SERVICE_ID + "\n";
-                        errorMsg += "2. Template ID: " + EMAILJS_TEMPLATE_ID + "\n";
-                        errorMsg += "3. Template should have variables: from_name, from_email, phone, message\n\n";
-                        errorMsg += "Please try again or email me directly at sc1797569@gmail.com";
-                        
-                        alert(errorMsg);
-                        submitBtn.prop('disabled', false).html(originalText);
-                    });
-                });
-            });
+            console.error("EmailJS Error:", error);
+            alert("Form submission failed!");
+            submitBtn.prop('disabled', false).html(originalText);
         });
     });
-    // <!-- emailjs to mail contact form data -->
 
 });
 
 // <!-- typed js effect starts -->
 var typed = new Typed(".typing-text", {
-    strings: [ "full stack web development","react applications","backend api development","building scalable web apps","android development"],
+    strings: [
+        "Full Stack Web Development",
+        "React Applications",
+        "Backend API Development",
+        "Building Scalable Web Apps",
+        "Android Development"
+    ],
     loop: true,
     typeSpeed: 50,
     backSpeed: 25,
-    backDelay: 500,
+    backDelay: 500
 });
 // <!-- typed js effect ends -->
 

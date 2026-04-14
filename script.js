@@ -95,35 +95,18 @@ $(document).ready(function () {
         const originalText = submitBtn.html();
         submitBtn.prop('disabled', true).html('Sending... <i class="fa fa-spinner fa-spin"></i>');
 
-        if (typeof emailjs === 'undefined') {
-            alert("Email service is not loaded. Please refresh the page and try again.");
-            submitBtn.prop('disabled', false).html(originalText);
-            return;
-        }
-
-        if (!emailjsInitialized) {
-            initializeEmailJS();
-        }
-
-        const templateParams = {
-            from_name: name,
-            from_email: email,
-            phone: phone || 'Not provided',
-            message: message,
-            to_email: 'sc1797569@gmail.com',
-            reply_to: email
-        };
-
-        emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-        .then(function () {
-            document.getElementById("contact-form").reset();
-            alert("✅ Form Submitted Successfully!");
-            submitBtn.prop('disabled', false).html(originalText);
-        }, function (error) {
-            console.error("EmailJS Error:", error);
-            alert("Form submission failed!");
-            submitBtn.prop('disabled', false).html(originalText);
-        });
+        // Create mailto link with form data
+        const subject = encodeURIComponent(`Contact Form: Message from ${name}`);
+        const body = encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\n\nMessage:\n${message}`);
+        const mailtoLink = `mailto:sc1797569@gmail.com?subject=${subject}&body=${body}`;
+        
+        // Open email client
+        window.location.href = mailtoLink;
+        
+        // Reset form
+        document.getElementById("contact-form").reset();
+        alert("✅ Opening your email client. Please send the email from there!");
+        submitBtn.prop('disabled', false).html(originalText);
     });
 
 });
@@ -144,16 +127,6 @@ var typed = new Typed(".typing-text", {
 });
 // <!-- typed js effect ends -->
 
-async function fetchData(type = "skills") {
-    let response
-    type === "skills" ?
-        response = await fetch("skills.json")
-        :
-        response = await fetch("./projects/projects.json")
-    const data = await response.json();
-    return data;
-}
-
 function showSkills(skills) {
     let skillsContainer = document.getElementById("skillsContainer");
     let skillHTML = "";
@@ -169,9 +142,22 @@ function showSkills(skills) {
     skillsContainer.innerHTML = skillHTML;
 }
 
-fetchData().then(data => {
-    showSkills(data);
-});
+const skillsData = [
+    { name: "HTML5", icon: "https://img.icons8.com/color/48/000000/html-5--v1.png" },
+    { name: "CSS3", icon: "https://img.icons8.com/color/48/000000/css3.png" },
+    { name: "JavaScript", icon: "https://img.icons8.com/color/48/000000/javascript--v1.png" },
+    { name: "Bootstrap", icon: "https://img.icons8.com/color/48/000000/bootstrap.png" },
+    { name: "React", icon: "https://img.icons8.com/color/48/000000/react-native.png" },
+    { name: "Node.js", icon: "https://img.icons8.com/color/48/000000/nodejs.png" },
+    { name: "Java", icon: "https://img.icons8.com/color/48/000000/java-coffee-cup-logo--v1.png" },
+    { name: "Python", icon: "https://img.icons8.com/color/48/000000/python--v1.png" },
+    { name: "MySQL", icon: "https://img.icons8.com/color/48/000000/mysql-logo.png" },
+    { name: "GitHub", icon: "https://img.icons8.com/glyph-neue/48/ffffff/github.png" },
+    { name: "Android", icon: "https://img.icons8.com/fluency/48/000000/android-os.png" },
+    { name: "LeetCode", icon: "https://img.icons8.com/?size=100&id=wDGo581Ea5Nf&format=png&color=000000" }
+];
+
+showSkills(skillsData);
 
 // <!-- tilt js effect starts -->
 VanillaTilt.init(document.querySelectorAll(".tilt"), {
